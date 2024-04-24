@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "teachers-hours-be", "teachers-hours-be\teachers-hours-be.csproj", "{1C2DFA9A-1EFE-46F0-A239-8B92C027CF3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "teachers-hours-be", "teachers-hours-be\teachers-hours-be.csproj", "{1C2DFA9A-1EFE-46F0-A239-8B92C027CF3A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TH.Services", "TH.Services\TH.Services.csproj", "{368814AA-0A4E-4D23-8CDA-771EBDA3D4EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TH.S3Client", "TH.S3Client\TH.S3Client.csproj", "{99B687C5-F0BE-4E03-AB70-AF3A8F43AD37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{1C2DFA9A-1EFE-46F0-A239-8B92C027CF3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C2DFA9A-1EFE-46F0-A239-8B92C027CF3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C2DFA9A-1EFE-46F0-A239-8B92C027CF3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{368814AA-0A4E-4D23-8CDA-771EBDA3D4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{368814AA-0A4E-4D23-8CDA-771EBDA3D4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{368814AA-0A4E-4D23-8CDA-771EBDA3D4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{368814AA-0A4E-4D23-8CDA-771EBDA3D4EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99B687C5-F0BE-4E03-AB70-AF3A8F43AD37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99B687C5-F0BE-4E03-AB70-AF3A8F43AD37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99B687C5-F0BE-4E03-AB70-AF3A8F43AD37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99B687C5-F0BE-4E03-AB70-AF3A8F43AD37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
