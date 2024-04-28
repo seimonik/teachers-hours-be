@@ -5,22 +5,28 @@ namespace TH.Services.RenderServices;
 
 public class RenderServiceContext
 {
-    public RenderServiceContext(GetTeachersHoursReportRequest request)
+    public RenderServiceContext(
+		IFormFile file,
+		string faculty,
+		TimeNorms timeNorms,
+        int rowCount,
+		SpecializationsModel specializations,
+        IEnumerable<TeacherRateModel> teacherRates)
     {
-        File = request.File;
-        Faculty = request.Faculty;
-        TimeNorms = request.TimeNorms;
-        RowCount = request.RowCount;
-        SpecialtiesRow = request.SpecialtiesRow;
-        RateRow = request.RateRow;
+        File = file;
+        Faculty = faculty;
+        TimeNorms = timeNorms;
+        RowCount = rowCount;
+		Specializations = specializations;
+		TeacherRates = teacherRates;
     }
 
     public IFormFile File { get; set; } = null!;
-    public string? Faculty { get; set; }
-    public TimeNorms? TimeNorms { get; set; }
-    public string? RowCount { get; set; }
-    public int SpecialtiesRow { get; set; }
-    public int RateRow { get; set; }
+    public string Faculty { get; set; } = string.Empty;
+    public TimeNorms TimeNorms { get; set; }
+    public int RowCount { get; set; }
+    public SpecializationsModel Specializations { get; set; } = null!;
+    public IEnumerable<TeacherRateModel> TeacherRates { get; set; }
 }
 
 public interface IRenderService : IService<RenderServiceContext, Stream>
