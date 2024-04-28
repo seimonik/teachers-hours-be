@@ -2,6 +2,9 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using TH.Services;
 using TH.S3Client;
+using TH.Dal;
+using TH.Dal.Extentions;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -14,6 +17,9 @@ builder.Services.AddControllers()
     .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 services.AddExcelGeneratorServices();
+
+services.AddDbContext<TeachersHoursDbContext>(opt =>
+    opt.UseNpgsql(configuration.GetConnectionString("TeachersHours")));
 
 services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
 
@@ -34,6 +40,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.Services.ApplyMigrations<TeachersHoursDbContext>();
 
 app.UseHttpsRedirection();
 app.UseRouting();
