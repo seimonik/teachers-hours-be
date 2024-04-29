@@ -2,19 +2,20 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using TH.Dal.Enums;
 
 namespace TH.Dal.Extentions;
 
 public static class ServiceCollectionExtensions
 {
-	private static void ReloadTypes(this DatabaseFacade database)
+	private static void ReloadTypes(string connectionString)
 	{
-		var connection = new NpgsqlConnection(database.GetConnectionString());
+		var connection = new NpgsqlConnection(connectionString);
 		connection.Open();
 		connection.ReloadTypes();
 	}
 
-	public static IServiceProvider ApplyMigrations<T>(this IServiceProvider serviceProvider) where T : DbContext
+	public static IServiceProvider ApplyMigrations<T>(this IServiceProvider serviceProvider, string connectionString) where T : DbContext
 	{
 		if (serviceProvider == null)
 		{
@@ -27,9 +28,20 @@ public static class ServiceCollectionExtensions
 		if (dbContext.Database.ProviderName != "Microsoft.EntityFrameworkCore.InMemory")
 		{
 			dbContext.Database.Migrate();
-			dbContext.Database.ReloadTypes();
+			ReloadTypes(connectionString);
 		}
 
 		return serviceProvider;
+	}
+
+	public static IServiceCollection AddDatabaseContext<T>(this IServiceCollection serviceCollection, string connectionString) where T : DbContext
+	{
+		var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+		dataSourceBuilder.MapEnum<DocumentTypes>();
+		var dataSource = dataSourceBuilder.Build();
+
+		serviceCollection.AddDbContext<T>(options => options.UseNpgsql(dataSource));
+
+		return serviceCollection;
 	}
 }

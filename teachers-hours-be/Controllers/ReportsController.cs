@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using teachers_hours_be.Application.Commands;
 using teachers_hours_be.Application.Models;
-using teachers_hours_be.Constants;
-using TH.Services.Models;
+using TH.Dal.Entities;
 using TH.Services.RenderServices;
 
 namespace teachers_hours_be.Controllers;
@@ -36,9 +35,6 @@ public class ReportsController : ControllerBase
 
     [HttpPost("add-file")]
     [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AddFile([FromForm] AddFileRequest request, CancellationToken cancellationToken)
-    {
-        await _mediator.Send(new AddFileToS3.Query(request.File), cancellationToken);
-        return Ok();
-    }
+    public async Task<Document> AddFile([FromForm] AddFileRequest request, CancellationToken cancellationToken) =>
+        await _mediator.Send(new AddDocument.Query(request.File, request.DocumentType), cancellationToken);
 }

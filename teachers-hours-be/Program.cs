@@ -18,8 +18,7 @@ builder.Services.AddControllers()
 
 services.AddExcelGeneratorServices();
 
-services.AddDbContext<TeachersHoursDbContext>(opt =>
-    opt.UseNpgsql(configuration.GetConnectionString("TeachersHours")));
+services.AddDatabaseContext<TeachersHoursDbContext>(configuration.GetConnectionString("TeachersHours")!);
 
 services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(assembly));
 
@@ -41,7 +40,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.Services.ApplyMigrations<TeachersHoursDbContext>();
+app.Services.ApplyMigrations<TeachersHoursDbContext>(configuration.GetConnectionString("TeachersHours")!);
 
 app.UseHttpsRedirection();
 app.UseRouting();

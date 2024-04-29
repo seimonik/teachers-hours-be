@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TH.Dal.Entities;
+using TH.Dal.Enums;
 
 namespace TH.Dal;
 
@@ -12,5 +13,6 @@ public class TeachersHoursDbContext : DbContext
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(TeachersHoursDbContext).Assembly);
+		modelBuilder.HasPostgresEnum<DocumentTypes>();
 	}
 }

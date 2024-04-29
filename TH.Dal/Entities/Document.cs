@@ -1,4 +1,6 @@
-﻿namespace TH.Dal.Entities;
+﻿using TH.Dal.Enums;
+
+namespace TH.Dal.Entities;
 
 public class Document
 {
@@ -6,4 +8,5 @@ public class Document
 	public string Name { get; set; } = String.Empty;
 	public string Url { get; set; } = String.Empty;
 	public DateTime CreatedAt { get; set; }
+	public DocumentTypes DocumentType { get; set; }
 }
