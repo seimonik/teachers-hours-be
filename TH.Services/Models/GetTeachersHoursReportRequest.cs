@@ -17,7 +17,7 @@ public class GetTeachersHoursReportRequest
     /// Нормы времени (обычно определяются по официальному документу на учебный год).
     /// </summary>
     public TimeNorms? TimeNorms { get; set; }
-    public string? RowCount { get; set; }
+    public int RowCount { get; set; }
     public int SpecialtiesRow { get; set; }
     public int RateRow { get; set; }
 }
