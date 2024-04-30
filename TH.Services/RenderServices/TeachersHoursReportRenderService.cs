@@ -8,8 +8,6 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
 {
     public async Task<Stream> ExecuteAsync(RenderServiceContext context, CancellationToken cancellationToken)
     {
-        //return context.Request.File.OpenReadStream();
-
         TeachersWorkload workload = new TeachersWorkload();
         workload.Faculty = context.Faculty;
         workload.TimeNorms = context.TimeNorms;
@@ -20,9 +18,9 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
         using (var package = new ExcelPackage(stream))
         {
             var worksheet = package.Workbook.Worksheets.First();
-            int rowTotal = int.Parse(context.RowCount);
+            int rowTotal = context.RowCount;
 
-            // Начало парчинга с 9 строки !!!
+            // Начало парчинга с 9 строки !!! (Рассмотреть дальнейшее расширение гибкости)
             for (var row = 9; row <= rowTotal; row++)
             {
                 try
@@ -55,37 +53,16 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
                 }
             }
 
-            for (var row = context.SpecialtiesRow + 1; row <= context.SpecialtiesRow + 4; row++)
-            {
-                string[] line = worksheet.Cells[row, 1].Value.ToString().Split(":", StringSplitOptions.RemoveEmptyEntries);
-                Dictionary<string, string> specializations = new Dictionary<string, string>();
-                foreach (string specialization in line[1].Split(",", StringSplitOptions.RemoveEmptyEntries))
-                {
-                    string[] NameAndCode = specialization.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                    specializations.Add(NameAndCode[0], NameAndCode[1]);
-                }
-                switch (row % context.SpecialtiesRow)
-                {
-                    case 1:
-                        workload.Bachelor = specializations;
-                        break;
-                    case 2:
-                        workload.Specialty = specializations;
-                        break;
-                    case 3:
-                        workload.Magistracy = specializations;
-                        break;
-                    case 4:
-                        workload.Postgraduate = specializations;
-                        break;
-                }
-            }
+			// Направления/специальности, их наименования
+			workload.Bachelor = context.Specializations.Bachelor;
+            workload.Specialty = context.Specializations.Specialty;
+            workload.Magistracy = context.Specializations.Magistracy;
+            workload.Postgraduate = context.Specializations.Postgraduate;
 
             // Ставки преподавателей
-            for (var row = context.RateRow + 1; worksheet.Cells[row, 1].Value != null; row++)
+            foreach(var teacherRate in context.TeacherRates)
             {
-                workload.teacherRate.Add(worksheet.Cells[row, 1].Value.ToString(),
-                    new Teacher(double.Parse(worksheet.Cells[row, 2].Value.ToString())));
+                workload.teacherRate.Add(teacherRate.FullName, new Teacher(teacherRate.Rate));
             }
         }
 
@@ -130,7 +107,6 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
             xlPackage.Workbook.Properties.Subject = "User List";
             // save the new spreadsheet
             xlPackage.Save();
-            // Response.Clear();
         }
         stream.Position = 0;
 
