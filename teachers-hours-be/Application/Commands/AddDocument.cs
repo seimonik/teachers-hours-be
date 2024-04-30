@@ -31,6 +31,7 @@ public class AddDocument
             {
                 DocumentTypes.Ordinary => $"all/{Guid.NewGuid()}",
                 DocumentTypes.Request => $"request/{Guid.NewGuid()}",
+                DocumentTypes.Calculation => $"calculation/{Guid.NewGuid()}",
                 _ => throw new Exception()
             };
 

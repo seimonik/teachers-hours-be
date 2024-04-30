@@ -34,6 +34,18 @@ builder.Services.AddSwaggerGen(o =>
 var s3Config = configuration.GetSection("S3");
 services.AddS3(s3Config);
 
+var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>() 
+    ?? throw new InvalidOperationException();
+
+services.AddCors(options =>
+{
+    options.AddDefaultPolicy(p => p.SetIsOriginAllowed(
+        origin => allowedOrigins.Contains(new Uri(origin).Host))
+    .AllowCredentials()
+    .AllowAnyHeader()
+    .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,6 +58,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseCors();
 
 app.MapControllers();
 

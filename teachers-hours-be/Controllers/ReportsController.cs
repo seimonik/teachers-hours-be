@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using teachers_hours_be.Application.Commands;
 using teachers_hours_be.Application.Models;
+using teachers_hours_be.Application.Queries;
 using TH.Dal.Entities;
 using TH.Services.RenderServices;
 
@@ -37,4 +38,8 @@ public class ReportsController : ControllerBase
     [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
     public async Task<Document> AddFile([FromForm] AddFileRequest request, CancellationToken cancellationToken) =>
         await _mediator.Send(new AddDocument.Query(request.File, request.DocumentType), cancellationToken);
+
+    [HttpGet]
+    public Task<IEnumerable<DocumentModel>> GetDocuments(CancellationToken cancellationToken) =>
+        _mediator.Send(new GetDocuments.Query(), cancellationToken);
 }
