@@ -8,11 +8,11 @@ using TH.S3Client;
 
 namespace teachers_hours_be.Application.Commands;
 
-public class AddDocument
+public static class AddDocument
 {
-    public record Query(IFormFile File, DocumentTypes DocumentType) : IRequest<Document>;
+    public record Command(IFormFile File, DocumentTypes DocumentType) : IRequest<Document>;
 
-    internal class Handler : IRequestHandler<Query, Document>
+    internal class Handler : IRequestHandler<Command, Document>
     {
         private readonly TeachersHoursDbContext _dbContext;
         private readonly ITransferUtility _transferUtility;
@@ -25,7 +25,7 @@ public class AddDocument
             _s3options = options.Value;
         }
 
-        public async Task<Document> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Document> Handle(Command request, CancellationToken cancellationToken)
         {
             var filePath = request.DocumentType switch
             {
