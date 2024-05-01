@@ -18,6 +18,7 @@ public static class TeacherConversionExtensions
 	public static GetTeacherModel ToGetTeacherModel(this Teacher teacher) =>
 		new GetTeacherModel
 		{
+			Id = teacher.Id,
 			FullName = teacher.FullName,
 			Name = teacher.Name,
 			Surname = teacher.Surname,

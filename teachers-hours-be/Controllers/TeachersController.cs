@@ -26,4 +26,8 @@ public class TeachersController : ControllerBase
 	[HttpGet]
 	public Task<IEnumerable<GetTeacherModel>> GetTeachers(CancellationToken cancellationToken) =>
 		_mediator.Send(new GetTeachers.Query(), cancellationToken);
+
+	[HttpPut("{teacherId}")]
+	public Task<Teacher> UpdateTeacher([FromRoute] Guid teacherId, [FromBody] AddOrUpdateTeacherModel teacher, CancellationToken cancellationToken) =>
+		_mediator.Send(new UpdateTeacher.Command(teacherId, teacher), cancellationToken);
 }
