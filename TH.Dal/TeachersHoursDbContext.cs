@@ -7,6 +7,7 @@ namespace TH.Dal;
 public class TeachersHoursDbContext : DbContext
 {
 	public DbSet<Document> Documents { get; protected set; } = null!;
+	public DbSet<Teacher> Teachers { get; protected set; } = null!;
 
 	public TeachersHoursDbContext(DbContextOptions<TeachersHoursDbContext> options) : base(options) { }
 
