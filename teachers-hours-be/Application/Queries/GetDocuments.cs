@@ -3,12 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using teachers_hours_be.Application.Models;
 using teachers_hours_be.Extensions.ModelConversion;
 using TH.Dal;
+using TH.Dal.Enums;
 
 namespace teachers_hours_be.Application.Queries;
 
 public static class GetDocuments
 {
-	public record Query() : IRequest<IEnumerable<DocumentModel>>;
+	public record Query(DocumentTypes? DocumentType = null) : IRequest<IEnumerable<DocumentModel>>;
 
 	internal class Handler : IRequestHandler<Query, IEnumerable<DocumentModel>>
 	{
@@ -22,6 +23,7 @@ public static class GetDocuments
 		public async Task<IEnumerable<DocumentModel>> Handle(Query request, CancellationToken cancellationToken)
 		{
 			var query = await _dbContext.Documents
+				.Where(d => request.DocumentType == null || d.DocumentType == request.DocumentType)
 				.AsNoTracking()
 				.ToListAsync();
 
