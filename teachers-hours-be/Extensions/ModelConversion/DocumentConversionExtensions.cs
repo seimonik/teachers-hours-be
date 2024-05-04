@@ -8,6 +8,7 @@ public static class DocumentConversionExtensions
 	public static DocumentModel ToDocumentModel(this Document document) =>
 		new DocumentModel
 		{
+			Id = document.Id,
 			Name = document.Name,
 			CreatedAt = document.CreatedAt,
 			DocumentType = document.DocumentType
