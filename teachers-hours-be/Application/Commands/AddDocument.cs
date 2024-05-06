@@ -35,7 +35,6 @@ public static class AddDocument
                 _ => throw new Exception()
             };
 
-
 			var uploadRequest = new TransferUtilityUploadRequest
             {
                 BucketName = _s3options.Bucket,
