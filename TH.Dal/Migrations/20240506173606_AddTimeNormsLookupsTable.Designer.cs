@@ -13,7 +13,7 @@ using TH.Dal.Enums;
 namespace TH.Dal.Migrations
 {
     [DbContext(typeof(TeachersHoursDbContext))]
-    [Migration("20240505193653_AddTimeNormsLookupsTable")]
+    [Migration("20240506173606_AddTimeNormsLookupsTable")]
     partial class AddTimeNormsLookupsTable
     {
         /// <inheritdoc />
@@ -117,8 +117,8 @@ namespace TH.Dal.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Norm")
-                        .HasColumnType("integer");
+                    b.Property<double>("Norm")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -129,59 +129,87 @@ namespace TH.Dal.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("53f1740e-f13f-4d5a-8068-e566f5caa87a"),
+                            Id = new Guid("85744b33-9494-4436-ad8d-743b92135b17"),
                             Code = "ProductionPractice",
                             Name = "Производственная практика",
-                            Norm = 0
+                            Norm = 4.0
                         },
                         new
                         {
-                            Id = new Guid("bdb7ced0-e611-41b3-ba11-9770fd61afc9"),
-                            Code = "EducationalPractice",
-                            Name = "Учебная практика (НИР)",
-                            Norm = 0
+                            Id = new Guid("41371a87-ec4c-4038-bd03-d07c80ff88a7"),
+                            Code = "EducationalPractice23",
+                            Name = "Учебная практика (НИР) 2 курс 3 семестр",
+                            Norm = 18.0
                         },
                         new
                         {
-                            Id = new Guid("4b4b7e08-bcf6-4a63-862a-e596cbc7931d"),
+                            Id = new Guid("3ec94a49-266d-4cf2-bfee-fe35516cbd79"),
+                            Code = "EducationalPractice35",
+                            Name = "Учебная практика (НИР) 3 курс 5 семестр",
+                            Norm = 18.0
+                        },
+                        new
+                        {
+                            Id = new Guid("25d1411a-e920-4d44-a036-849698387abf"),
+                            Code = "EducationalPractice24",
+                            Name = "Учебная практика (НИР) 2 курс 4 семестр",
+                            Norm = 16.0
+                        },
+                        new
+                        {
+                            Id = new Guid("386cfcb3-643d-4b0f-9135-b5ea4f5182cd"),
+                            Code = "EducationalPractice36",
+                            Name = "Учебная практика (НИР) 3 курс 6 семестр",
+                            Norm = 16.0
+                        },
+                        new
+                        {
+                            Id = new Guid("760ecbf0-03be-484b-b076-c37059dc478b"),
+                            Code = "EducationalPractice47",
+                            Name = "Учебная практика (НИР) 4 курс 7 семестр",
+                            Norm = 14.0
+                        },
+                        new
+                        {
+                            Id = new Guid("837a8528-d235-4649-aa32-1e3b01f33928"),
                             Code = "Coursework2",
                             Name = "Норма часов по курсовым работам (2 курс)",
-                            Norm = 0
+                            Norm = 5.0
                         },
                         new
                         {
-                            Id = new Guid("440014d1-fa11-455e-84cf-64bcd8d1b391"),
+                            Id = new Guid("051f35df-bc4e-452f-9d1a-4a708372fc2f"),
                             Code = "Coursework3",
                             Name = "Норма часов по курсовым работам (3 курс)",
-                            Norm = 0
+                            Norm = 10.0
                         },
                         new
                         {
-                            Id = new Guid("6b06b872-5147-4658-ba13-66956d196d70"),
+                            Id = new Guid("d456e79d-c74d-4783-b9a1-8aecdfb31750"),
                             Code = "Coursework2PO",
                             Name = "Норма часов по курсовым работам для ПО (2 курс)",
-                            Norm = 0
+                            Norm = 3.0
                         },
                         new
                         {
-                            Id = new Guid("b9bd6779-ccf4-440d-809b-7cbaa183cebb"),
+                            Id = new Guid("a90b91fa-b823-4643-8186-9e2cb90d7156"),
                             Code = "Coursework3PO",
                             Name = "Норма часов по курсовым работам для ПО (3 курс)",
-                            Norm = 0
+                            Norm = 10.0
                         },
                         new
                         {
-                            Id = new Guid("e1d63cf1-4672-4619-b116-35d6cf41eca4"),
+                            Id = new Guid("89bae101-3f08-4e1e-b93f-d2bd578b9361"),
                             Code = "FinalQualifyingWorkBachelor",
                             Name = "ВКР (бакалавриат)",
-                            Norm = 0
+                            Norm = 24.25
                         },
                         new
                         {
-                            Id = new Guid("54df6a58-1185-4b46-949d-7287daea86dc"),
+                            Id = new Guid("39d825fb-5e2e-4bc8-b0f6-44d95a122fab"),
                             Code = "FinalQualifyingWorkMagistracy",
                             Name = "ВКР (магистратура)",
-                            Norm = 0
+                            Norm = 34.25
                         });
                 });
 #pragma warning restore 612, 618
