@@ -3,17 +3,18 @@ using Amazon.S3.Transfer;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using teachers_hours_be.Application.Models;
+using teachers_hours_be.Constants;
 using TH.Dal;
 using TH.S3Client;
-using TH.Services.RenderServices;
 
 namespace teachers_hours_be.Application.Queries;
 
 public static class GetDocumentFile
 {
-	public record Query(Guid DocumentId) : IRequest<byte[]>;
+	public record Query(Guid DocumentId) : IRequest<FileDownloadResult>;
 
-	internal class Handler : IRequestHandler<Query, byte[]>
+	internal class Handler : IRequestHandler<Query, FileDownloadResult>
 	{
 		private readonly TeachersHoursDbContext _dbContext;
 		private readonly ITransferUtility _transferUtility;
@@ -28,7 +29,7 @@ public static class GetDocumentFile
 			_s3options = options.Value;
 		}
 
-		public async Task<byte[]> Handle(Query request, CancellationToken cancellationToken)
+		public async Task<FileDownloadResult> Handle(Query request, CancellationToken cancellationToken)
 		{
 			var document = _dbContext.Documents
 				.Where(d => d.Id == request.DocumentId)
@@ -44,7 +45,19 @@ public static class GetDocumentFile
 			using MemoryStream ms = new MemoryStream();
 			response.ResponseStream.CopyTo(ms);
 
-			return ms.ToArray();
+			var mimeType = Path.GetExtension(document!.Name) switch
+			{
+				".docx" => MimeTypes.Docx,
+				".xlsx" => MimeTypes.Xlsx,
+				_ => throw new ArgumentException()
+			};
+
+			return new FileDownloadResult
+			{
+				FileByteArray = ms.ToArray(),
+				MimeType = mimeType,
+				FileName = document!.Name
+			};
 		}
 	}
 }

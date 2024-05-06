@@ -51,15 +51,11 @@ public class ReportsController : ControllerBase
     [HttpGet("{documentId}/download")]
     public async Task<IActionResult> GetDocumentFile([FromRoute] Guid documentId, CancellationToken cancellationToken)
     {
-        var fileByte = await _mediator.Send(new GetDocumentFile.Query(documentId), cancellationToken);
-        return File(fileByte, MimeTypes.Docx, "test.docx");
+        var fileResult = await _mediator.Send(new GetDocumentFile.Query(documentId), cancellationToken);
+        return File(fileResult.FileByteArray, fileResult.MimeType, fileResult.FileName);
     }
 
-	[HttpPost("{documentId}/add-teachers")]
-	public async Task<IActionResult> Test([FromRoute] Guid documentId, IEnumerable<string> teachersNames, CancellationToken cancellationToken)
-    {
-        var fileStream = await _mediator.Send(new AddTeachersToExcelDocument.Command(documentId, teachersNames), cancellationToken);
-
-        return File(fileStream, MimeTypes.Xlsx, "test.xlsx");
-	}
+    [HttpPost("{documentId}/add-teachers")]
+    public Task<DocumentModel> Test([FromRoute] Guid documentId, IEnumerable<string> teachersNames, CancellationToken cancellationToken) =>
+        _mediator.Send(new AddTeachersToExcelDocument.Command(documentId, teachersNames), cancellationToken);
 }

@@ -1,8 +1,9 @@
 ﻿using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using teachers_hours_be.Application.Models;
+using teachers_hours_be.Extensions.ModelConversion;
 using TH.Dal;
 using TH.S3Client;
 using TH.Services.RenderServices;
@@ -12,9 +13,9 @@ namespace teachers_hours_be.Application.Commands;
 public static class AddTeachersToExcelDocument
 {
 	public record Command(Guid DocumentId,
-						  IEnumerable<string> TeachersFullNames) : IRequest<byte[]>;
+						  IEnumerable<string> TeachersFullNames) : IRequest<DocumentModel>;
 
-	internal class Handler : IRequestHandler<Command, byte[]>
+	internal class Handler : IRequestHandler<Command, DocumentModel>
 	{
 		private readonly TeachersHoursDbContext _dbContext;
 		private readonly IAddTeachersService _addTeachersService;
@@ -32,22 +33,43 @@ public static class AddTeachersToExcelDocument
 			_s3options = options.Value;
 		}
 
-		public async Task<byte[]> Handle(Command request, CancellationToken cancellationToken)
+		public async Task<DocumentModel> Handle(Command request, CancellationToken cancellationToken)
 		{
-			var document = _dbContext.Documents
+			var documentDb = _dbContext.Documents
 				.Where(d=>d.Id == request.DocumentId)
-				.AsNoTracking()
 				.SingleOrDefault();
 
 			var requestS3 = new GetObjectRequest
 			{
 				BucketName = _s3options.Bucket,
-				Key = document!.Url,
+				Key = documentDb!.Url,
 			};
 			using GetObjectResponse response = await _transferUtility.S3Client.GetObjectAsync(requestS3);
 
-			return await _addTeachersService.ExecuteAsync(new AddTeachersServiceContext(
+			var updatedFile = await _addTeachersService.ExecuteAsync(new AddTeachersServiceContext(
 				response.ResponseStream, request.TeachersFullNames), cancellationToken);
+
+			var filePath = $"request/{Guid.NewGuid()}";
+			await _transferUtility.UploadAsync(
+				new TransferUtilityUploadRequest
+				{
+					BucketName = _s3options.Bucket,
+					Key = filePath,
+					AutoCloseStream = true,
+					InputStream = new MemoryStream(updatedFile)
+				}, cancellationToken);
+
+			await _transferUtility.S3Client.DeleteObjectAsync(
+				new DeleteObjectRequest
+				{
+					BucketName = _s3options.Bucket,
+					Key = documentDb.Url
+				}, cancellationToken);
+
+			documentDb.Url = filePath;
+			await _dbContext.SaveChangesAsync();
+
+			return documentDb.ToDocumentModel();
 		}
 	}
 }
