@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using TH.Services.Models;
+﻿using TH.Services.Models;
 
 namespace TH.Services.RenderServices;
 
 public class RenderServiceContext
 {
     public RenderServiceContext(
-		IFormFile file,
+		Stream file,
 		string faculty,
 		TimeNorms timeNorms,
         int rowCount,
@@ -21,7 +20,7 @@ public class RenderServiceContext
 		TeacherRates = teacherRates;
     }
 
-    public IFormFile File { get; set; } = null!;
+    public Stream File { get; set; } = null!;
     public string Faculty { get; set; } = string.Empty;
     public TimeNorms TimeNorms { get; set; }
     public int RowCount { get; set; }

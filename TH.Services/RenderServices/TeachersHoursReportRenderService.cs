@@ -12,16 +12,15 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
         workload.Faculty = context.Faculty;
         workload.TimeNorms = context.TimeNorms;
 
-        var stream = context.File.OpenReadStream();
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-        using (var package = new ExcelPackage(stream))
+        using (var package = new ExcelPackage(context.File))
         {
             var worksheet = package.Workbook.Worksheets.First();
             int rowTotal = context.RowCount;
 
             // Начало парчинга с 9 строки !!! (Рассмотреть дальнейшее расширение гибкости)
-            for (var row = 9; row <= rowTotal; row++)
+            for (var row = 0; row <= rowTotal; row++)
             {
                 try
                 {

@@ -13,6 +13,7 @@ public class TeachersHoursDbContext : DbContext
 
 	// lookups
 	public DbSet<TimeNorm> TimeNorms { get; protected set; } = null!;
+	public DbSet<Specialization> Specializations { get; protected set; } = null!;
 
 	public TeachersHoursDbContext(DbContextOptions<TeachersHoursDbContext> options) : base(options) { }
 
@@ -20,5 +21,6 @@ public class TeachersHoursDbContext : DbContext
 	{
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(TeachersHoursDbContext).Assembly);
 		modelBuilder.HasPostgresEnum<DocumentTypes>();
+		modelBuilder.HasPostgresEnum<EducationLevelTypes>();
 	}
 }
