@@ -13,5 +13,10 @@ internal sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
 		builder.Property(d => d.CreatedAt)
 			.ValueGeneratedNever()
 			.HasDefaultValueSql("now() at time zone 'utc'");
+
+		builder.HasOne(x => x.ParentDocument)
+			.WithMany(c => c.ChildDocuments)
+			.HasForeignKey(e => e.ParentDocumentId)
+			.OnDelete(DeleteBehavior.SetNull);
 	}
 }

@@ -12,7 +12,7 @@ namespace teachers_hours_be.Application.Commands;
 
 public static class GenerateCalculation
 {
-	public record Command(Guid RequestId) : IRequest<FileDownloadResult>;
+	public record Command(Guid DocumentId) : IRequest<FileDownloadResult>;
 
 	internal class Handler : IRequestHandler<Command, FileDownloadResult>
 	{
@@ -45,7 +45,7 @@ public static class GenerateCalculation
 				FinalQualifyingWorkBachelor = timeNormsLookups.Single(x => x.Code == "FinalQualifyingWorkBachelor").Norm,
 				FinalQualifyingWorkMagistracy = timeNormsLookups.Single(x => x.Code == "FinalQualifyingWorkMagistracy").Norm
 			};
-			(var file, int endRow) = await GetDocumentWithEndRow(request.RequestId, cancellationToken);
+			(var file, int endRow) = await GetDocumentWithEndRow(request.DocumentId, cancellationToken);
 
 			var specializations = await _mediator.Send(new GetSpecializations.Query(), cancellationToken);
 
@@ -62,16 +62,15 @@ public static class GenerateCalculation
 			return new FileDownloadResult { FileByteArray = ms.ToArray(), FileName = "Расчет_преподавательских_часов.xlsx", MimeType = MimeTypes.Xlsx };
 		}
 
-		private Task<Request> GetRequest(Guid requestId) =>
-			_dbContext.Requests.AsNoTracking().SingleAsync(x => x.Id == requestId);
+		private Task<Document> GetDocumentMetadata(Guid documentId) =>
+			_dbContext.Documents.AsNoTracking().SingleAsync(x => x.Id == documentId);
 
-		private async Task<(Stream, int)> GetDocumentWithEndRow(Guid requestId, CancellationToken cancellationToken)
+		private async Task<(Stream, int)> GetDocumentWithEndRow(Guid documentId, CancellationToken cancellationToken)
 		{
-			var request = await GetRequest(requestId);
+			var document = await GetDocumentMetadata(documentId);
 
-			//var documrnt = await _dbContext.Documents.AsNoTracking().SingleAsync(x => x.Id == request.DocumentId);
-			var result = await _mediator.Send(new GetDocumentFile.Query(request.DocumentId), cancellationToken);
-			return (new MemoryStream(result.FileByteArray), request.EndRow);
+			var result = await _mediator.Send(new GetDocumentFile.Query(documentId), cancellationToken);
+			return (new MemoryStream(result.FileByteArray), document.EndRow ?? 9);
 		}
 	}
 }
