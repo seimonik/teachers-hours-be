@@ -1,10 +1,12 @@
-﻿using MediatR;
+﻿using Amazon.S3.Transfer;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using teachers_hours_be.Application.Models;
+using Microsoft.Extensions.Options;
 using teachers_hours_be.Application.Queries;
-using teachers_hours_be.Constants;
 using TH.Dal;
 using TH.Dal.Entities;
+using TH.Dal.Enums;
+using TH.S3Client;
 using TH.Services.Models;
 using TH.Services.RenderServices;
 
@@ -12,22 +14,30 @@ namespace teachers_hours_be.Application.Commands;
 
 public static class GenerateCalculation
 {
-	public record Command(Guid DocumentId) : IRequest<FileDownloadResult>;
+	public record Command(Guid DocumentId) : IRequest<Document>;
 
-	internal class Handler : IRequestHandler<Command, FileDownloadResult>
+	internal class Handler : IRequestHandler<Command, Document>
 	{
 		private readonly IRenderService _renderService;
 		private readonly IMediator _mediator;
 		private readonly TeachersHoursDbContext _dbContext;
+		private readonly ITransferUtility _transferUtility;
+		private readonly S3Options _s3options;
 
-		public Handler(IRenderService renderService, IMediator mediator, TeachersHoursDbContext dbContext)
+		public Handler(IRenderService renderService, 
+					   IMediator mediator, 
+					   TeachersHoursDbContext dbContext,
+					   ITransferUtility transferUtility, 
+					   IOptions<S3Options> options)
 		{
 			_renderService = renderService;
 			_mediator = mediator;
 			_dbContext = dbContext;
+			_transferUtility = transferUtility;
+			_s3options = options.Value;
 		}
 
-		public async Task<FileDownloadResult> Handle(Command request, CancellationToken cancellationToken)
+		public async Task<Document> Handle(Command request, CancellationToken cancellationToken)
 		{
 			var timeNormsLookups = await _mediator.Send(new GetTimeNorms.Query(), cancellationToken);
 			var timeNorms = new TimeNorms
@@ -56,10 +66,12 @@ public static class GenerateCalculation
 			var context = new RenderServiceContext(file, "КНиИТ", timeNorms, endRow, specializations, teacherRates);
 			var result = await _renderService.ExecuteAsync(context, cancellationToken);
 
-			using MemoryStream ms = new MemoryStream();
-			result.CopyTo(ms);
+			return await AddDocument(result, request.DocumentId, cancellationToken);
 
-			return new FileDownloadResult { FileByteArray = ms.ToArray(), FileName = "Расчет_преподавательских_часов.xlsx", MimeType = MimeTypes.Xlsx };
+			//using MemoryStream ms = new MemoryStream();
+			//result.CopyTo(ms);
+
+			//return new FileDownloadResult { FileByteArray = ms.ToArray(), FileName = "Расчет_преподавательских_часов.xlsx", MimeType = MimeTypes.Xlsx };
 		}
 
 		private Task<Document> GetDocumentMetadata(Guid documentId) =>
@@ -71,6 +83,32 @@ public static class GenerateCalculation
 
 			var result = await _mediator.Send(new GetDocumentFile.Query(documentId), cancellationToken);
 			return (new MemoryStream(result.FileByteArray), document.EndRow ?? 9);
+		}
+
+		private async Task<Document> AddDocument(Stream fileStream, Guid parentDocumentId, CancellationToken cancellationToken)
+		{
+			string url = $"calculation/{Guid.NewGuid()}";
+			var uploadRequest = new TransferUtilityUploadRequest
+			{
+				BucketName = _s3options.Bucket,
+				Key = url,
+				AutoCloseStream = true,
+				InputStream = fileStream
+			};
+			await _transferUtility.UploadAsync(uploadRequest, cancellationToken);
+
+			var document = new Document
+			{
+				Name = $"Расчет_часов_{DateTime.Now}.xlsx",
+				Url = url,
+				CreatedAt = DateTime.UtcNow,
+				DocumentType = DocumentTypes.Calculation,
+				ParentDocumentId = parentDocumentId
+			};
+			_dbContext.Documents.Add(document);
+			await _dbContext.SaveChangesAsync();
+
+			return document;
 		}
 	}
 }

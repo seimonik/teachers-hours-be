@@ -56,10 +56,7 @@ public class ReportsController : ControllerBase
     public Task<DocumentModel> Test([FromRoute] Guid documentId, IEnumerable<string> teachersNames, CancellationToken cancellationToken) =>
         _mediator.Send(new AddTeachersToExcelDocument.Command(documentId, teachersNames), cancellationToken);
 
-	[HttpPost("generate-calculation/{documentId}")]
-	public async Task<IActionResult> GetCalculationFile([FromRoute] Guid documentId, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new GenerateCalculation.Command(documentId), cancellationToken);
-        return File(result.FileByteArray, result.MimeType, result.FileName);
-	}
+    [HttpPost("generate-calculation/{documentId}")]
+    public Task<Document> GetCalculationFile([FromRoute] Guid documentId, CancellationToken cancellationToken) =>
+        _mediator.Send(new GenerateCalculation.Command(documentId), cancellationToken);
 }

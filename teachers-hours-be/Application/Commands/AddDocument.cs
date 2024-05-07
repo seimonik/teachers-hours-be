@@ -12,7 +12,7 @@ public static class AddDocument
 {
     public record Command(IFormFile File, DocumentTypes DocumentType) : IRequest<Document>;
 
-    internal class Handler : IRequestHandler<Command, Document>
+	internal class Handler : IRequestHandler<Command, Document>
     {
         private readonly TeachersHoursDbContext _dbContext;
         private readonly ITransferUtility _transferUtility;
