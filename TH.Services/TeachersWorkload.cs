@@ -226,10 +226,18 @@ public class TeachersWorkload
                         }
                         else if (nameLower.Contains("учебная") || nameLower.Contains("НИР"))
                         {
-                            worksheet.Cells[$"P{row}"].Value = TimeNorms.EducationalPractice * StudentNumber;
-                            worksheet.Cells[$"Z{row}"].Value = TimeNorms.EducationalPractice * StudentNumber;
-                            totalHours.Practice += TimeNorms.EducationalPractice * StudentNumber;
-                            totalHours.Total += TimeNorms.EducationalPractice * StudentNumber;
+                            var educationalPractice = subject.Semester switch
+                            {
+                                3 => TimeNorms.EducationalPractice23,
+                                5 => TimeNorms.EducationalPractice35,
+                                4 => TimeNorms.EducationalPractice24,
+                                6 => TimeNorms.EducationalPractice36,
+                                7 => TimeNorms.EducationalPractice47,
+                            };
+							worksheet.Cells[$"P{row}"].Value = educationalPractice * StudentNumber;
+                            worksheet.Cells[$"Z{row}"].Value = educationalPractice * StudentNumber;
+                            totalHours.Practice += educationalPractice * StudentNumber;
+                            totalHours.Total += educationalPractice * StudentNumber;
                         }
                         //else if (nameLower.Contains("технологическая") || nameLower.Contains("вычислительная"))
                         //{

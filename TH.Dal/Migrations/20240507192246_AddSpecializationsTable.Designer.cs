@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TH.Dal;
@@ -12,9 +13,11 @@ using TH.Dal.Enums;
 namespace TH.Dal.Migrations
 {
     [DbContext(typeof(TeachersHoursDbContext))]
-    partial class TeachersHoursDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507192246_AddSpecializationsTable")]
+    partial class AddSpecializationsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,15 +41,9 @@ namespace TH.Dal.Migrations
                     b.Property<DocumentTypes>("DocumentType")
                         .HasColumnType("document_types");
 
-                    b.Property<int?>("EndRow")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid?>("ParentDocumentId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -54,9 +51,27 @@ namespace TH.Dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentDocumentId");
-
                     b.ToTable("Documents");
+                });
+
+            modelBuilder.Entity("TH.Dal.Entities.Request", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("EndRow")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ParentDocumentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Requests");
                 });
 
             modelBuilder.Entity("TH.Dal.Entities.Specialization", b =>
@@ -318,21 +333,6 @@ namespace TH.Dal.Migrations
                             Name = "ВКР (магистратура)",
                             Norm = 34.25
                         });
-                });
-
-            modelBuilder.Entity("TH.Dal.Entities.Document", b =>
-                {
-                    b.HasOne("TH.Dal.Entities.Document", "ParentDocument")
-                        .WithMany("ChildDocuments")
-                        .HasForeignKey("ParentDocumentId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("ParentDocument");
-                });
-
-            modelBuilder.Entity("TH.Dal.Entities.Document", b =>
-                {
-                    b.Navigation("ChildDocuments");
                 });
 #pragma warning restore 612, 618
         }

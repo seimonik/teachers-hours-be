@@ -38,6 +38,7 @@ public static class ServiceCollectionExtensions
 	{
 		var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 		dataSourceBuilder.MapEnum<DocumentTypes>();
+		dataSourceBuilder.MapEnum<EducationLevelTypes>();
 		var dataSource = dataSourceBuilder.Build();
 
 		serviceCollection.AddDbContext<T>(options => options.UseNpgsql(dataSource));

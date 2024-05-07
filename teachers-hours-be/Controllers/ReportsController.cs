@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using teachers_hours_be.Application.Commands;
 using teachers_hours_be.Application.Models;
 using teachers_hours_be.Application.Queries;
-using teachers_hours_be.Constants;
 using TH.Dal.Entities;
 using TH.Services.Models;
-using TH.Services.RenderServices;
 
 namespace teachers_hours_be.Controllers;
 
@@ -16,12 +14,11 @@ namespace teachers_hours_be.Controllers;
 public class ReportsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IRenderService _renderService;
+    
 
-    public ReportsController(IMediator mediator, IRenderService renderService)
+    public ReportsController(IMediator mediator)
     {
         _mediator = mediator;
-        _renderService = renderService;
     }
 
     // TODO: !!! Будет добавлен после подключени БД !!!
@@ -58,4 +55,8 @@ public class ReportsController : ControllerBase
     [HttpPost("{documentId}/add-teachers")]
     public Task<DocumentModel> Test([FromRoute] Guid documentId, IEnumerable<string> teachersNames, CancellationToken cancellationToken) =>
         _mediator.Send(new AddTeachersToExcelDocument.Command(documentId, teachersNames), cancellationToken);
+
+    [HttpPost("generate-calculation/{documentId}")]
+    public Task<Document> GetCalculationFile([FromRoute] Guid documentId, CancellationToken cancellationToken) =>
+        _mediator.Send(new GenerateCalculation.Command(documentId), cancellationToken);
 }
