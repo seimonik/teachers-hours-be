@@ -43,7 +43,8 @@ services.AddCors(options =>
         origin => allowedOrigins.Contains(new Uri(origin).Host))
     .AllowCredentials()
     .AllowAnyHeader()
-    .AllowAnyMethod());
+    .AllowAnyMethod()
+    .WithExposedHeaders("Content-Disposition"));
 });
 
 var app = builder.Build();

@@ -2,7 +2,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using teachers_hours_be.Application.Models;
 using teachers_hours_be.Application.Queries;
+using teachers_hours_be.Application.Queries.Lookups;
+using teachers_hours_be.Extensions.ModelConversion;
 using TH.Dal;
 using TH.Dal.Entities;
 using TH.Dal.Enums;
@@ -14,9 +17,9 @@ namespace teachers_hours_be.Application.Commands;
 
 public static class GenerateCalculation
 {
-	public record Command(Guid DocumentId) : IRequest<Document>;
+	public record Command(Guid DocumentId) : IRequest<DocumentModel>;
 
-	internal class Handler : IRequestHandler<Command, Document>
+	internal class Handler : IRequestHandler<Command, DocumentModel>
 	{
 		private readonly IRenderService _renderService;
 		private readonly IMediator _mediator;
@@ -37,7 +40,7 @@ public static class GenerateCalculation
 			_s3options = options.Value;
 		}
 
-		public async Task<Document> Handle(Command request, CancellationToken cancellationToken)
+		public async Task<DocumentModel> Handle(Command request, CancellationToken cancellationToken)
 		{
 			var timeNormsLookups = await _mediator.Send(new GetTimeNorms.Query(), cancellationToken);
 			var timeNorms = new TimeNorms
@@ -85,7 +88,7 @@ public static class GenerateCalculation
 			return (new MemoryStream(result.FileByteArray), document.EndRow ?? 9);
 		}
 
-		private async Task<Document> AddDocument(Stream fileStream, Guid parentDocumentId, CancellationToken cancellationToken)
+		private async Task<DocumentModel> AddDocument(Stream fileStream, Guid parentDocumentId, CancellationToken cancellationToken)
 		{
 			string url = $"calculation/{Guid.NewGuid()}";
 			var uploadRequest = new TransferUtilityUploadRequest
@@ -108,7 +111,7 @@ public static class GenerateCalculation
 			_dbContext.Documents.Add(document);
 			await _dbContext.SaveChangesAsync();
 
-			return document;
+			return document.ToDocumentModel();
 		}
 	}
 }

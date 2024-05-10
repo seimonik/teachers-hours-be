@@ -11,6 +11,8 @@ public static class DocumentConversionExtensions
 			Id = document.Id,
 			Name = document.Name,
 			CreatedAt = document.CreatedAt,
-			DocumentType = document.DocumentType
+			DocumentType = document.DocumentType,
+			ChildDocuments = document.ChildDocuments?.Select(x => x.ToDocumentModel()) 
+			?? Enumerable.Empty<DocumentModel>()
 		};
 }

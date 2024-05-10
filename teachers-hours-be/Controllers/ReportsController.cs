@@ -14,24 +14,11 @@ namespace teachers_hours_be.Controllers;
 public class ReportsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    
 
     public ReportsController(IMediator mediator)
     {
         _mediator = mediator;
     }
-
-    // TODO: !!! Будет добавлен после подключени БД !!!
-
-    //[HttpPost("download")]
-    //[ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
-    //public async Task<ActionResult> GenerateTeachersHoursReport([FromForm] GetTeachersHoursReportRequest request, CancellationToken cancellationToken)
-    //{
-    //    var context = new RenderServiceContext(request);
-    //    var result = await _renderService.ExecuteAsync(context, cancellationToken);
-
-    //    return File(result, MimeTypes.Xlsx, "test_help.xlsx");
-    //}
 
     [HttpPost("add-file")]
     public async Task<Document> AddFile([FromForm] AddFileRequest request, CancellationToken cancellationToken) =>
@@ -41,7 +28,11 @@ public class ReportsController : ControllerBase
     public Task<IEnumerable<DocumentModel>> GetDocuments([FromQuery] GetDocumentsModel request, CancellationToken cancellationToken) =>
         _mediator.Send(new GetDocuments.Query(request.DocumentType), cancellationToken);
 
-    [HttpGet("{documentId}")]
+	[HttpGet("{documentId}")]
+	public Task<DocumentModel> GetDocuments([FromRoute] Guid documentId, CancellationToken cancellationToken) =>
+		_mediator.Send(new GetDocument.Query(documentId), cancellationToken);
+
+	[HttpGet("{documentId}/subjects")]
     public Task<IEnumerable<SubjectModel>> GetSubjects([FromRoute] Guid documentId, CancellationToken cancellationToken) =>
         _mediator.Send(new GetSubjects.Query(documentId), cancellationToken);
 
@@ -57,6 +48,6 @@ public class ReportsController : ControllerBase
         _mediator.Send(new AddTeachersToExcelDocument.Command(documentId, teachersNames), cancellationToken);
 
     [HttpPost("generate-calculation/{documentId}")]
-    public Task<Document> GetCalculationFile([FromRoute] Guid documentId, CancellationToken cancellationToken) =>
+    public Task<DocumentModel> GetCalculationFile([FromRoute] Guid documentId, CancellationToken cancellationToken) =>
         _mediator.Send(new GenerateCalculation.Command(documentId), cancellationToken);
 }
