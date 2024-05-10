@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using teachers_hours_be.Application.Models;
+using teachers_hours_be.Application.Models.Lookups;
 using teachers_hours_be.Extensions.ModelConversion;
 using TH.Dal;
 
-namespace teachers_hours_be.Application.Queries;
+namespace teachers_hours_be.Application.Queries.Lookups;
 
 public static class GetTimeNorms
 {
@@ -21,11 +21,11 @@ public static class GetTimeNorms
 
 		public async Task<IEnumerable<TimeNormModel>> Handle(Query request, CancellationToken cancellationToken)
 		{
-			var lookups = (await _dbContext.TimeNorms
+			var specializations = await _dbContext.TimeNorms
 				.AsNoTracking()
-				.ToListAsync(cancellationToken)).Select(x => x.ToTimeNormModel());
+				.ToListAsync();
 
-			return lookups;
+			return specializations.Select(x => x.ToTimeNormModel());
 		}
 	}
 }

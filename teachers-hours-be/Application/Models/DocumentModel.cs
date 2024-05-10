@@ -8,4 +8,5 @@ public class DocumentModel
 	public string Name { get; set; } = String.Empty;
 	public DateTime CreatedAt { get; set; }
 	public DocumentTypes DocumentType { get; set; }
+	public IEnumerable<DocumentModel> ChildDocuments { get; set; } = Enumerable.Empty<DocumentModel>();
 }
