@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TH.Services.GenerateDocxService;
 using TH.Services.ParsingSevice;
 using TH.Services.RenderServices;
 
@@ -10,10 +11,10 @@ public static class ServiceCollectionExtensions
     {
         if (services == null) throw new ArgumentNullException(nameof(services));
 
-        // TODO: Добавить сервис для генерации excel отчета
         services.AddScoped<IRenderService, TeachersHoursReportRenderService>();
         services.AddScoped<IParsingService, GetSubjects>();
         services.AddScoped<IAddTeachersService, AddTeachersService>();
+        services.AddScoped<IRenderCourseworkJournalService, RenderCourseworkJournalService>();
 
         return services;
     }

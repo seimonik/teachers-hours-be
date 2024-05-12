@@ -45,7 +45,8 @@ public static class GetSubjects
 				Key = document!.Url,
 			};
 			using GetObjectResponse response = await _transferUtility.S3Client.GetObjectAsync(requestS3);
-			return await _parsingService.ExecuteAsync(new ParsingServiceContext(response.ResponseStream), cancellationToken);
+			return await _parsingService.ExecuteAsync(
+				new ParsingServiceContext(response.ResponseStream, document.EndRow!.Value), cancellationToken);
 		}
 	}
 }

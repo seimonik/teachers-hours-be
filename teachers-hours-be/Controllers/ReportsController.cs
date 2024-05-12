@@ -22,7 +22,8 @@ public class ReportsController : ControllerBase
 
     [HttpPost("add-file")]
     public async Task<Document> AddFile([FromForm] AddFileRequest request, CancellationToken cancellationToken) =>
-        await _mediator.Send(new AddDocument.Command(request.File, request.DocumentType), cancellationToken);
+        await _mediator.Send(new AddDocument.Command(
+            request.File, request.DocumentType, request.EndRow), cancellationToken);
 
     [HttpGet]
     public Task<IEnumerable<DocumentModel>> GetDocuments([FromQuery] GetDocumentsModel request, CancellationToken cancellationToken) =>
