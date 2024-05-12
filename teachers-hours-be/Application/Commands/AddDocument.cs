@@ -10,7 +10,7 @@ namespace teachers_hours_be.Application.Commands;
 
 public static class AddDocument
 {
-    public record Command(IFormFile File, DocumentTypes DocumentType) : IRequest<Document>;
+    public record Command(IFormFile File, DocumentTypes DocumentType, int? EndRow = null) : IRequest<Document>;
 
 	internal class Handler : IRequestHandler<Command, Document>
     {
@@ -49,7 +49,8 @@ public static class AddDocument
                 Name = request.File.FileName,
                 Url = filePath,
                 CreatedAt = DateTime.UtcNow,
-                DocumentType = request.DocumentType
+                DocumentType = request.DocumentType,
+                EndRow = request.EndRow
             };
             _dbContext.Documents.Add(document);
             await _dbContext.SaveChangesAsync();

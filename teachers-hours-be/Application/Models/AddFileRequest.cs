@@ -6,4 +6,5 @@ public class AddFileRequest
 {
     public IFormFile File { get; set; } = null!;
     public DocumentTypes DocumentType { get; set; } = DocumentTypes.Ordinary;
+    public int? EndRow { get; set; } = null;
 }

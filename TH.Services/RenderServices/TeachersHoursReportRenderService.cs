@@ -20,7 +20,7 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
             int rowTotal = context.RowCount;
 
             // Начало парчинга с 9 строки !!! (Рассмотреть дальнейшее расширение гибкости)
-            for (var row = 0; row <= rowTotal; row++)
+            for (var row = 9; row <= rowTotal; row++)
             {
                 try
                 {

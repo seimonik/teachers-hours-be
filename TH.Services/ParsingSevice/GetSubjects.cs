@@ -14,7 +14,7 @@ public class GetSubjects : IParsingService
 			var result = new List<SubjectModel>();
 
 			// TODO: Добавить при сохранении запись в БД строк начала и конца заявки
-			for (var row = 1; row <= 7; row++)
+			for (var row = 9; row <= context.EndRow; row++)
 			{
 				SubjectModel subject = new SubjectModel()
 				{
