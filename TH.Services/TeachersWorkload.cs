@@ -39,6 +39,7 @@ public class TeachersWorkload
     public Dictionary<string, Teacher> teacherRate = new Dictionary<string, Teacher>();
 
 
+    // Название предмета для практики, идущей за ним
     private string LastSubjectName = " ";
     public void Add(string nameTeachers, Subject subject)
     {
@@ -219,8 +220,10 @@ public class TeachersWorkload
                     {
                         if (nameLower.Contains("базовая") || nameLower.Contains("технологическая") || nameLower.Contains("производственная"))
                         {
-                            worksheet.Cells[$"P{row}"].Value = TimeNorms.ProductionPractice * StudentNumber;
-                            worksheet.Cells[$"Z{row}"].Value = TimeNorms.ProductionPractice * StudentNumber;
+							worksheet.Cells[$"P{row}"].Formula = $"={TimeNorms.ProductionPractice} * F{row}";
+							worksheet.Cells[$"Z{row}"].Formula = $"=SUM(I{row}:Y{row})";
+							//worksheet.Cells[$"P{row}"].Value = TimeNorms.ProductionPractice * StudentNumber;
+                            //worksheet.Cells[$"Z{row}"].Value = TimeNorms.ProductionPractice * StudentNumber;
                             totalHours.Practice += TimeNorms.ProductionPractice * StudentNumber;
                             totalHours.Total += TimeNorms.ProductionPractice * StudentNumber;
                         }

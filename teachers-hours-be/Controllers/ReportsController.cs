@@ -23,7 +23,7 @@ public class ReportsController : ControllerBase
     [HttpPost("add-file")]
     public async Task<Document> AddFile([FromForm] AddFileRequest request, CancellationToken cancellationToken) =>
         await _mediator.Send(new AddDocument.Command(
-            request.File, request.DocumentType, request.EndRow), cancellationToken);
+            request.File, request.DocumentType), cancellationToken);
 
     [HttpGet]
     public Task<IEnumerable<DocumentModel>> GetDocuments([FromQuery] GetDocumentsModel request, CancellationToken cancellationToken) =>
@@ -51,4 +51,18 @@ public class ReportsController : ControllerBase
     [HttpPost("generate-calculation/{documentId}")]
     public Task<DocumentModel> GetCalculationFile([FromRoute] Guid documentId, CancellationToken cancellationToken) =>
         _mediator.Send(new GenerateCalculation.Command(documentId), cancellationToken);
+
+    [HttpDelete("{documentId}")]
+    public async Task<IActionResult> DeleteDocument([FromRoute] Guid documentId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _mediator.Send(new DeleteDocument.Command(documentId), cancellationToken);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500);
+        }
+    }
 }

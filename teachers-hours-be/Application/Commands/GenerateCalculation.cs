@@ -1,6 +1,5 @@
 ﻿using Amazon.S3.Transfer;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using teachers_hours_be.Application.Models;
 using teachers_hours_be.Application.Queries;
@@ -12,6 +11,7 @@ using TH.Dal.Enums;
 using TH.S3Client;
 using TH.Services.Models;
 using TH.Services.RenderServices;
+using TH.Services.TeachersHoursService;
 
 namespace teachers_hours_be.Application.Commands;
 
@@ -22,6 +22,7 @@ public static class GenerateCalculation
 	internal class Handler : IRequestHandler<Command, DocumentModel>
 	{
 		private readonly IRenderService _renderService;
+		private readonly IReportRenderService _reportRenderService;
 		private readonly IMediator _mediator;
 		private readonly TeachersHoursDbContext _dbContext;
 		private readonly ITransferUtility _transferUtility;
@@ -31,13 +32,15 @@ public static class GenerateCalculation
 					   IMediator mediator, 
 					   TeachersHoursDbContext dbContext,
 					   ITransferUtility transferUtility, 
-					   IOptions<S3Options> options)
+					   IOptions<S3Options> options,
+					   IReportRenderService reportRenderService)
 		{
 			_renderService = renderService;
 			_mediator = mediator;
 			_dbContext = dbContext;
 			_transferUtility = transferUtility;
 			_s3options = options.Value;
+			_reportRenderService = reportRenderService;
 		}
 
 		public async Task<DocumentModel> Handle(Command request, CancellationToken cancellationToken)
@@ -58,7 +61,7 @@ public static class GenerateCalculation
 				FinalQualifyingWorkBachelor = timeNormsLookups.Single(x => x.Code == "FinalQualifyingWorkBachelor").Norm,
 				FinalQualifyingWorkMagistracy = timeNormsLookups.Single(x => x.Code == "FinalQualifyingWorkMagistracy").Norm
 			};
-			(var file, int endRow) = await GetDocumentWithEndRow(request.DocumentId, cancellationToken);
+			var file = await GetDocument(request.DocumentId, cancellationToken);
 
 			var specializations = await _mediator.Send(new GetSpecializations.Query(), cancellationToken);
 
@@ -66,8 +69,10 @@ public static class GenerateCalculation
 				.Select(x => new TeacherRateModel { FullName = x.FullName, Rate = x.Rate })
 				.ToList();
 
-			var context = new RenderServiceContext(file, "КНиИТ", timeNorms, endRow, specializations, teacherRates);
-			var result = await _renderService.ExecuteAsync(context, cancellationToken);
+			//var context = new RenderServiceContext(file, "КНиИТ", timeNorms, specializations, teacherRates);
+			//var result = await _renderService.ExecuteAsync(context, cancellationToken);
+
+			var result = await _reportRenderService.ExecuteAsync(new ReportRenderServiceContext(file, "КНиИТ", timeNorms, specializations, teacherRates), cancellationToken);
 
 			return await AddDocument(result, request.DocumentId, cancellationToken);
 
@@ -77,15 +82,10 @@ public static class GenerateCalculation
 			//return new FileDownloadResult { FileByteArray = ms.ToArray(), FileName = "Расчет_преподавательских_часов.xlsx", MimeType = MimeTypes.Xlsx };
 		}
 
-		private Task<Document> GetDocumentMetadata(Guid documentId) =>
-			_dbContext.Documents.AsNoTracking().SingleAsync(x => x.Id == documentId);
-
-		private async Task<(Stream, int)> GetDocumentWithEndRow(Guid documentId, CancellationToken cancellationToken)
+		private async Task<Stream> GetDocument(Guid documentId, CancellationToken cancellationToken)
 		{
-			var document = await GetDocumentMetadata(documentId);
-
 			var result = await _mediator.Send(new GetDocumentFile.Query(documentId), cancellationToken);
-			return (new MemoryStream(result.FileByteArray), document.EndRow ?? 9);
+			return new MemoryStream(result.FileByteArray);
 		}
 
 		private async Task<DocumentModel> AddDocument(Stream fileStream, Guid parentDocumentId, CancellationToken cancellationToken)

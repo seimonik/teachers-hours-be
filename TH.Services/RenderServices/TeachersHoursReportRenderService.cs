@@ -19,7 +19,7 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
             var worksheet = package.Workbook.Worksheets.First();
             int rowTotal = context.RowCount;
 
-            // Начало парчинга с 9 строки !!! (Рассмотреть дальнейшее расширение гибкости)
+            // Начало парсинга с 9 строки !!! (Рассмотреть дальнейшее расширение гибкости)
             for (var row = 9; row <= rowTotal; row++)
             {
                 try
@@ -74,7 +74,7 @@ internal sealed class TeachersHoursReportRenderService : IRenderService
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using (var xlPackage = new ExcelPackage(stream))
         {
-            var worksheetP1 = xlPackage.Workbook.Worksheets.Add("p1");
+			var worksheetP1 = xlPackage.Workbook.Worksheets.Add("p1");
             var namedStyle = xlPackage.Workbook.Styles.CreateNamedStyle("HyperLink");
             namedStyle.Style.Font.UnderLine = true;
             namedStyle.Style.Font.Color.SetColor(Color.Blue);

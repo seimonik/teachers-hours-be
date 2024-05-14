@@ -12,13 +12,21 @@ public class GetSubjects : IParsingService
 		{
 			var worksheet = package.Workbook.Worksheets.First();
 			var result = new List<SubjectModel>();
+			int rowMax = 1000;
 
 			// TODO: Добавить при сохранении запись в БД строк начала и конца заявки
-			for (var row = 9; row <= context.EndRow; row++)
+			for (var row = 9; row < rowMax; row++)
 			{
+				string nameSubject = worksheet.Cells[row, 1].Value?.ToString();
+				if (nameSubject == null || nameSubject.Trim() == string.Empty)
+				{
+					row = rowMax;
+					continue;
+				}
+
 				SubjectModel subject = new SubjectModel()
 				{
-					Name = worksheet.Cells[row, 1].Value?.ToString(),
+					Name = nameSubject,
 					Specialization = worksheet.Cells[row, 2].Value.ToString(),
 					Semester = int.Parse(worksheet.Cells[row, 3].Value.ToString()),
 					Budget = worksheet.Cells[row, 4].Value == null ? 0 : int.Parse(worksheet.Cells[row, 4].Value.ToString()),
