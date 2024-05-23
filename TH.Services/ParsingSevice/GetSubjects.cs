@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Newtonsoft.Json;
+using OfficeOpenXml;
 using TH.Services.Models;
 
 namespace TH.Services.ParsingSevice;
@@ -41,7 +42,7 @@ public class GetSubjects : IParsingService
 					LoadPerWeek = worksheet.Cells[row, 13].Value == null ? null : int.Parse(worksheet.Cells[row, 13].Value?.ToString()),
 					ReportingForm = worksheet.Cells[row, 14].Value?.ToString(),
 					Remark = worksheet.Cells[row, 15].Value?.ToString(),
-					TeacherFullName = worksheet.Cells[row, 16].Value?.ToString()
+					TeacherFullName = JsonConvert.DeserializeObject<IEnumerable<TeacherStudents>>(worksheet.Cells[row, 16].Value?.ToString())
 				};
 				result.Add(subject);
 			}

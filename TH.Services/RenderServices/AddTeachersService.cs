@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Newtonsoft.Json;
+using OfficeOpenXml;
 
 namespace TH.Services.RenderServices;
 
@@ -14,7 +15,7 @@ internal sealed class AddTeachersService : IAddTeachersService
 			int row = 9;
 			foreach (var teacherName in context.TeachersFullNames)
 			{
-				worksheet.Cells[$"P{row}"].Value = teacherName;
+				worksheet.Cells[$"P{row}"].Value = JsonConvert.SerializeObject(teacherName);
 				row++;
 			}
 

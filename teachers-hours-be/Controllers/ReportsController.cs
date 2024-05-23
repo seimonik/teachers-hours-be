@@ -45,7 +45,7 @@ public class ReportsController : ControllerBase
     }
 
     [HttpPost("{documentId}/add-teachers")]
-    public Task<DocumentModel> Test([FromRoute] Guid documentId, IEnumerable<string> teachersNames, CancellationToken cancellationToken) =>
+    public Task<DocumentModel> AddTeachersToExcelDocument([FromRoute] Guid documentId, [FromBody] IEnumerable<IEnumerable<TeacherStudents>> teachersNames, CancellationToken cancellationToken) =>
         _mediator.Send(new AddTeachersToExcelDocument.Command(documentId, teachersNames), cancellationToken);
 
     [HttpPost("generate-calculation/{documentId}")]

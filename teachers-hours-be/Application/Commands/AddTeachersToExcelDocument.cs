@@ -6,6 +6,7 @@ using teachers_hours_be.Application.Models;
 using teachers_hours_be.Extensions.ModelConversion;
 using TH.Dal;
 using TH.S3Client;
+using TH.Services.Models;
 using TH.Services.RenderServices;
 
 namespace teachers_hours_be.Application.Commands;
@@ -13,7 +14,7 @@ namespace teachers_hours_be.Application.Commands;
 public static class AddTeachersToExcelDocument
 {
 	public record Command(Guid DocumentId,
-						  IEnumerable<string> TeachersFullNames) : IRequest<DocumentModel>;
+						  IEnumerable<IEnumerable<TeacherStudents>> TeachersFullNames) : IRequest<DocumentModel>;
 
 	internal class Handler : IRequestHandler<Command, DocumentModel>
 	{
@@ -45,6 +46,8 @@ public static class AddTeachersToExcelDocument
 				Key = documentDb!.Url,
 			};
 			using GetObjectResponse response = await _transferUtility.S3Client.GetObjectAsync(requestS3);
+
+			//var test = response.ResponseStream;
 
 			var updatedFile = await _addTeachersService.ExecuteAsync(new AddTeachersServiceContext(
 				response.ResponseStream, request.TeachersFullNames), cancellationToken);

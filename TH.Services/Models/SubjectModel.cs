@@ -17,5 +17,5 @@ public class SubjectModel
 	public int? LoadPerWeek { get; set; }
 	public string? ReportingForm { get; set; }
 	public string? Remark { get; set; }
-	public string? TeacherFullName { get; set; }
+	public IEnumerable<TeacherStudents>? TeacherFullName { get; set; }
 }
