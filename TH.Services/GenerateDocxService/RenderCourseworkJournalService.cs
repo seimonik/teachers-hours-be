@@ -18,7 +18,7 @@ internal sealed class RenderCourseworkJournalService : IRenderCourseworkJournalS
 			int rowCount = 1;
 			foreach (var teachers in course.Value)
 			{
-				rowCount += teachers.Value;
+				rowCount += teachers.StudentsCount;
 			}
 
 			Table teachersTable = document.AddTable(rowCount, 3);
@@ -29,8 +29,8 @@ internal sealed class RenderCourseworkJournalService : IRenderCourseworkJournalS
 			int row = 1;
 			foreach (var teachers in course.Value)
 			{
-				teachersTable.Rows[row].Cells[0].Paragraphs[0].Append(teachers.Key).FontSize(14).Font("Times New Roman");
-				int endRow = row + teachers.Value - 1;
+				teachersTable.Rows[row].Cells[0].Paragraphs[0].Append(teachers.TeacherName).FontSize(14).Font("Times New Roman");
+				int endRow = row + teachers.StudentsCount - 1;
 				if (row < endRow)
 					teachersTable.MergeCellsInColumn(0, row, endRow);
 

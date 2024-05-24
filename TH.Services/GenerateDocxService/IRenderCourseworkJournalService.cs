@@ -1,13 +1,15 @@
-﻿namespace TH.Services.GenerateDocxService;
+﻿using TH.Services.Models;
+
+namespace TH.Services.GenerateDocxService;
 
 public class RenderCourseworkJournalContext
 {
-	public RenderCourseworkJournalContext(Dictionary<string, Dictionary<string, int>> courseworkJournal)
+	public RenderCourseworkJournalContext(Dictionary<string, IEnumerable<TeacherStudents>> courseworkJournal)
 	{
 		CourseworkJournal = courseworkJournal;
 	}
 
-	public Dictionary<string, Dictionary<string, int>> CourseworkJournal { get; set; }
+	public Dictionary<string, IEnumerable<TeacherStudents>> CourseworkJournal { get; set; }
 }
 
 public interface IRenderCourseworkJournalService : IService<RenderCourseworkJournalContext, byte[]>
