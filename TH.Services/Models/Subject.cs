@@ -17,6 +17,6 @@ public class Subject
     public int? LoadPerWeek { get; set; }
     public string? ReportingForm { get; set; }
     public string? Remark { get; set; }
-    public string Teacher { get; set; } = string.Empty!;
+    public IEnumerable<TeacherStudents>? Teacher { get; set; }
     public bool practice { get; set; }
 }

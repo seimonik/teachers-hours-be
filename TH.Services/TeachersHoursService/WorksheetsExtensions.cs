@@ -2,15 +2,16 @@
 using OfficeOpenXml.Style;
 using TH.Services.Constants;
 using TH.Services.Models;
+using Xceed.Document.NET;
 
 namespace TH.Services.TeachersHoursService;
 
 public static class WorksheetsExtensions
 {
-	private static readonly string[] ClockCells = 
-		new string[] { "I", "J", "K", "L", "M", "N","O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+	private static readonly string[] ClockCells =
+		new string[] { "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
 	private static readonly string[] CalculationCellsInCWorksheet =
-		new string[] { "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S" };
+		new string[] { "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T" };
 
 	public static ExcelWorksheet PrintToExcelP(this ExcelWorksheet worksheet, 
 		IEnumerable<Subject> subjects, TimeNorms timeNorms, SpecializationsModel specializations, 
@@ -167,11 +168,11 @@ public static class WorksheetsExtensions
 	}
 
 	public static ExcelWorksheet PrintToExcelC(this ExcelWorksheet worksheet, 
-		IEnumerable<Subject> subjects, string faculty, bool budget, List<TeacherGenerateModel> teacherGenerateInfo)
+		IEnumerable<TeacherSubject> subjects, string faculty, bool budget, List<TeacherGenerateModel> teacherGenerateInfo)
 	{
 		int row = 1;
 
-		var subjectsByTeacher = subjects.GroupBy(s => s.Teacher);
+		var subjectsByTeacher = subjects.GroupBy(s => s.TeacherName);
 		foreach (var teacherSubjects in subjectsByTeacher)
 		{
 			worksheet.Cells[$"A{row}"].Value = "Карточка учебных поручений на 2023/2024 учебный год";
@@ -233,7 +234,7 @@ public static class WorksheetsExtensions
 
 			startRow = row;
 
-			var secondSemesterSubjects = teacherSubjects.Select(x => x).Where(s => s.Semester % 2 == 1);
+			var secondSemesterSubjects = teacherSubjects.Select(x => x).Where(s => s.Semester % 2 == 0);
 			worksheet.PrintC(budget, secondSemesterSubjects, ref row, faculty);
 
 			worksheet.Cells[$"A{startRow}:A{row}"].Style.WrapText = true;
@@ -251,10 +252,10 @@ public static class WorksheetsExtensions
 	}
 
 	public static void PrintC(this ExcelWorksheet worksheet, bool budget, 
-		IEnumerable<Subject> subjects, ref int row, string faculty)
+		IEnumerable<TeacherSubject> subjects, ref int row, string faculty)
 	{
 		int startRow = row;
-		foreach (Subject subject in subjects)
+		foreach (TeacherSubject subject in subjects)
 		{
 			var studentNumber = budget ? subject.Budget : subject.Commercial;
 
@@ -371,7 +372,7 @@ public static class WorksheetsExtensions
 			worksheet.Cells[$"{cell}{row}"].Formula = $"=SUM({cell}{startRow}:{cell}{row - 1})";
 		}
 
-		// TODO: счетчик часов преподавателя
+		// TODO: счетчик часов преподавателя для учета превышения нормы
 
 		//totalHours.PrintToExcel(worksheet, row);
 		//if (budget)
@@ -397,13 +398,13 @@ public static class WorksheetsExtensions
 			worksheet.Cells[$"A{row}"].Value = teacherInfo.FullName;
 			worksheet.Cells[$"B{row}"].Value = "очн";
 
-			foreach(var cell in CalculationCellsInCWorksheet)
+			for (int i = 0; i < 18; i++)
 			{
 				var firstSemester = budget ? teacherInfo.FirstSemesterBudgetRow : teacherInfo.FirstSemesterCommercialRow;
 				var secondSemester = budget ? teacherInfo.SecondSemesterBudgetRow : teacherInfo.SecondSemesterCommercialRow;
 				var worksheetName = budget ? "c1" : "c2";
-				worksheet.Cells[$"{cell}{row}"].Formula =
-					$"={worksheetName}!{cell}{firstSemester}+{worksheetName}!{cell}{secondSemester}";
+				worksheet.Cells[$"{CalculationCellsInCWorksheet[i]}{row}"].Formula =
+					$"={worksheetName}!{ClockCells[i]}{firstSemester}+{worksheetName}!{ClockCells[i]}{secondSemester}";
 				worksheet.Cells[$"T{row}"].Formula = $"=SUM(C{row}:S{row})";
 			}
 			row++;

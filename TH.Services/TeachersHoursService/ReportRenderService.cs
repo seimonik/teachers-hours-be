@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using Newtonsoft.Json;
+using OfficeOpenXml;
 using System.Drawing;
 using TH.Services.Models;
 
@@ -60,7 +61,7 @@ public class ReportRenderService : IReportRenderService
 						LoadPerWeek = worksheet.Cells[row, 13].Value == null ? null : int.Parse(worksheet.Cells[row, 13].Value?.ToString()),
 						ReportingForm = worksheet.Cells[row, 14].Value?.ToString(),
 						Remark = worksheet.Cells[row, 15].Value?.ToString(),
-						Teacher = worksheet.Cells[row, 16].Value?.ToString() ?? string.Empty,
+						Teacher = JsonConvert.DeserializeObject<IEnumerable<TeacherStudents>>(worksheet.Cells[row, 16].Value?.ToString()),
 						practice = practice
 					};
 
@@ -94,10 +95,11 @@ public class ReportRenderService : IReportRenderService
 
 				var worksheetC1 = xlPackage.Workbook.Worksheets.Add("c1");
 				var teacherGenerateInfo = new List<TeacherGenerateModel>();
-				worksheetC1.PrintToExcelC(subjects, context.Faculty, true, teacherGenerateInfo);
+				var teacherSubjects = subjects.Select(x => x.ToTeacherSubject()).SelectMany(x => x);
+				worksheetC1.PrintToExcelC(teacherSubjects, context.Faculty, true, teacherGenerateInfo);
 
 				var worksheetC2 = xlPackage.Workbook.Worksheets.Add("c2");
-				worksheetC2.PrintToExcelC(subjects, context.Faculty, false, teacherGenerateInfo);
+				worksheetC2.PrintToExcelC(teacherSubjects, context.Faculty, false, teacherGenerateInfo);
 
 				var worksheetO1 = xlPackage.Workbook.Worksheets.Add("o1");
 				worksheetO1.PrintToExcelO(true, teacherGenerateInfo);
