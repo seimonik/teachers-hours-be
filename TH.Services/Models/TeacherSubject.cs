@@ -1,6 +1,6 @@
 ﻿namespace TH.Services.Models;
 
-public class SubjectModel
+public class TeacherSubject
 {
 	public string Name { get; set; } = null!;
 	public string? Specialization { get; set; }
@@ -17,5 +17,6 @@ public class SubjectModel
 	public int? LoadPerWeek { get; set; }
 	public string? ReportingForm { get; set; }
 	public string? Remark { get; set; }
-	public IEnumerable<TeacherStudents>? TeacherFullName { get; set; }
+	public string TeacherName { get; set; } = string.Empty!;
+	public bool practice { get; set; }
 }
