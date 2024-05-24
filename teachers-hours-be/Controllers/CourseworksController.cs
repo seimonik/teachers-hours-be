@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using teachers_hours_be.Constants;
 using TH.Services.GenerateDocxService;
+using TH.Services.Models;
 
 namespace teachers_hours_be.Controllers;
 
@@ -20,7 +21,7 @@ public class CourseworksController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> GetCourseworkJournal(Dictionary<string, Dictionary<string, int>> courseworkJournal, CancellationToken cancellationToken)
+	public async Task<IActionResult> GetCourseworkJournal(Dictionary<string, IEnumerable<TeacherStudents>> courseworkJournal, CancellationToken cancellationToken)
 	{
 		var fileByte = await _journalService.ExecuteAsync(new RenderCourseworkJournalContext(courseworkJournal), cancellationToken);
 		return File(fileByte, MimeTypes.Docx, "filetest.docx");
