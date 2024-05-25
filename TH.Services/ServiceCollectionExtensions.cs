@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAddTeachersService, AddTeachersService>();
         services.AddScoped<IRenderCourseworkJournalService, RenderCourseworkJournalService>();
         services.AddScoped<IReportRenderService, ReportRenderService>();
+        services.AddScoped<IValidateService, ValidateService>();
 
         return services;
     }
