@@ -1,10 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using teachers_hours_be.Application.Commands;
 using teachers_hours_be.Application.Models;
 using teachers_hours_be.Application.Queries;
+using teachers_hours_be.Constants;
 using TH.Dal.Entities;
 using TH.Services.Models;
+using TH.Services.ParsingSevice;
+using GetSubjects = teachers_hours_be.Application.Queries.GetSubjects;
 
 namespace teachers_hours_be.Controllers;
 
@@ -14,10 +18,12 @@ namespace teachers_hours_be.Controllers;
 public class ReportsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IValidateService _validateService;
 
-    public ReportsController(IMediator mediator)
+	public ReportsController(IMediator mediator, IValidateService validateService)
     {
         _mediator = mediator;
+        _validateService = validateService;
     }
 
     [HttpPost("add-file")]
@@ -64,5 +70,19 @@ public class ReportsController : ControllerBase
         {
             return StatusCode(500);
         }
+    }
+
+    [HttpPost("validate")]
+    public async Task<IActionResult> ValidateDocument([FromForm] FileValidateModel request, CancellationToken cancellationToken)
+    {
+        var fileStream = request.File.OpenReadStream();
+        var result = await _validateService.ExecuteAsync(new ValidateServiceContext(fileStream), cancellationToken);
+
+        if (result == null)
+        {
+            return Ok();
+        }
+
+        return File(result, MimeTypes.Xlsx, "валидационные ошибки.xlsx");
     }
 }
