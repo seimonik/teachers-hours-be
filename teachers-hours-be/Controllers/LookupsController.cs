@@ -33,4 +33,15 @@ public class LookupsController : ControllerBase
 	[HttpGet("time-norms")]
 	public Task<IEnumerable<TimeNormModel>> GetTimeNorms(CancellationToken cancellationToken) =>
 		_mediator.Send(new GetTimeNorms.Query(), cancellationToken);
+
+	[HttpPost("time-norms")]
+	public IActionResult AddOrUpdateTimeNorms(CancellationToken cancellationToken)
+	{
+		return Ok();
+	}
+	[HttpDelete("time-norms/{code}")]
+	public IActionResult DeleteTimeNorms(CancellationToken cancellationToken)
+	{
+		return Ok();
+	}
 }

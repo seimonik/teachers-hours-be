@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using teachers_hours_be.Application.Commands;
 using teachers_hours_be.Application.Models;
@@ -23,6 +24,7 @@ public class TeachersController : ControllerBase
 	public Task<Teacher> AddTeacher(AddOrUpdateTeacherModel teacher, CancellationToken cancellationToken) =>
 		_mediator.Send(new AddTeacher.Command(teacher), cancellationToken);
 
+	[Authorize]
 	[HttpGet]
 	public Task<IEnumerable<GetTeacherModel>> GetTeachers(CancellationToken cancellationToken) =>
 		_mediator.Send(new GetTeachers.Query(), cancellationToken);
