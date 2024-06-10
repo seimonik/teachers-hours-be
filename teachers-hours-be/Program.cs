@@ -5,6 +5,7 @@ using TH.S3Client;
 using TH.Dal;
 using TH.Dal.Extentions;
 using Microsoft.EntityFrameworkCore;
+using Keycloak.AuthServices.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -29,6 +30,10 @@ builder.Services.AddSwaggerGen(o =>
     o.SwaggerDoc("v1", new OpenApiInfo { Title = "teachers-hours-be", Version = "v1" });
     //o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml"));
 });
+
+// Add Keycloak
+builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
 
 // Add S3
 var s3Config = configuration.GetSection("S3");
@@ -58,6 +63,7 @@ app.Services.ApplyMigrations<TeachersHoursDbContext>(configuration.GetConnection
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCors();
